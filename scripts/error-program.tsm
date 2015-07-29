@@ -1,0 +1,6 @@
+#! ./build/scriptism
+# this is an error program. It should fail to run.
+
+p r i n t "First say this" x
+
+

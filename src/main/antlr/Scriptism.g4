@@ -1,0 +1,59 @@
+grammar Scriptism;
+
+options
+{
+    language = Java;
+}
+
+@header {
+    package scriptism.grammar;
+}
+
+program
+    :
+    |   ( COMMENT | printStatement | declarationStatement | assignmentStatement )*
+    ;
+
+printStatement
+    :   PRINT
+    |   PRINT STRING
+    |   PRINT IDENTIFIER
+    ;
+
+declarationStatement
+    :   VAR IDENTIFIER
+    ;
+
+assignmentStatement
+    :   IDENTIFIER '=' INTEGER
+    ;
+
+PRINT
+    :   'print'
+    ;
+
+VAR
+    :   'var'
+    ;
+
+STRING
+    : '"' ~('\"')* '"' {setText(getText().substring(1, getText().length()-1));}
+    ;
+
+IDENTIFIER
+    :   LETTER (DIGIT | LETTER)*
+    ;
+
+INTEGER
+    :   DIGIT+
+    ;
+
+COMMENT
+    :  '#' ~( '\r' | '\n' )* ( '\r' | '\n' )
+    ;
+
+WS  :   [ \t\r\n]+ -> skip
+    ;
+
+fragment DIGIT         : '0' .. '9';
+fragment LETTER        : 'a' .. 'z' | 'A' .. 'Z';

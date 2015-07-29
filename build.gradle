@@ -1,0 +1,73 @@
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'antlr'
+
+dependencies {
+    compile 'org.ow2.asm:asm:5.0.4'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    testCompile 'junit:junit:4.12'
+    antlr "org.antlr:antlr4:4.5" // use ANTLR version 4
+}
+
+generateGrammarSource {
+    arguments += ["-visitor", "-long-messages"]
+}
+
+// By default, Antlr generates the source files in a directory that does not
+// match the package. This task will move the generated source files to a
+// directory matching the package.
+generateGrammarSource.doLast {
+    File generatedDir = file('build/generated-src/antlr/main')
+    File packageDir = new File(generatedDir, 'scriptism/grammar')
+    packageDir.mkdirs()
+    generatedDir.listFiles().each {File file ->
+        file.renameTo(new File(packageDir, file.getName()))
+    }
+}
+
+task(run, dependsOn: 'classes', type: JavaExec) {
+    main = 'scriptism.Main'
+    classpath = sourceSets.main.runtimeClasspath
+    args 'scripts/some-variables.ts'
+}
+
+//create a single Jar with all dependencies
+task consolidatedJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Scriptism',
+                   'Implementation-Version': '1.0',
+                   'Main-Class': 'scriptism.Main'
+    }
+    baseName = project.name
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+def copy(File src, File dest) {
+
+    def input = src.newDataInputStream()
+    def output = dest.newDataOutputStream()
+
+    output << "#! /bin/sh\nexec /usr/bin/java -jar \$0 \"\$@\"\n"
+
+    output << input
+
+    input.close()
+    output.close()
+}
+
+task executableJar(dependsOn: 'consolidatedJar') {
+    doLast {
+        def jarFile = new File("build/libs/scriptism.jar")
+        def executableFile = new File("build/scriptism")
+
+        copy(jarFile, executableFile)
+
+        Runtime.getRuntime().exec("chmod +x " + executableFile.getAbsolutePath()).waitFor()
+    }
+}
+
+defaultTasks 'executableJar'
