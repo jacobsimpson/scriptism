@@ -10,10 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static scriptism.compiler.Utils.getEscapedString;
 
 public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     private final String className;
-    private Set<String> variables = new HashSet<>();
+    private final Set<String> variables = new HashSet<>();
     private final StringWriter writer = new StringWriter();
     private final PrintWriter out = new PrintWriter(writer);
 
@@ -23,7 +24,13 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
 
     @Override
     public Integer visitAssignmentStatement(@NotNull ScriptismParser.AssignmentStatementContext ctx) {
-        out.printf("    %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.INTEGER().getText());
+        if (ctx.STRING() != null) {
+            out.printf("    %s = \"%s\";\n", ctx.IDENTIFIER().getText(), getEscapedString(ctx.STRING().getText()));
+        } else if (ctx.INTEGER() != null) {
+            out.printf("    %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.INTEGER().getText());
+        } else if (ctx.DOUBLE() != null) {
+            out.printf("    %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.DOUBLE().getText());
+        }
         return visitChildren(ctx);
     }
 
@@ -34,7 +41,27 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
             throw new RuntimeException(format("The variable '%s' is already defined.", varName));
         }
         variables.add(varName);
-        out.printf("    int %s;\n", ctx.IDENTIFIER().getText());
+        if (ctx.TYPE() != null) {
+            if ("Int".equals(ctx.TYPE().getText())) {
+                out.printf("    int %s;\n", ctx.IDENTIFIER().getText());
+            } else if ("Double".equals(ctx.TYPE().getText())) {
+                out.printf("    double %s;\n", ctx.IDENTIFIER().getText());
+            } else if ("String".equals(ctx.TYPE().getText())) {
+                out.printf("    String %s;\n", ctx.IDENTIFIER().getText());
+            } else {
+                throw new RuntimeException(format("Unknown type '%s'.", ctx.IDENTIFIER().getText()));
+            }
+        } else {
+            if (ctx.INTEGER() != null) {
+                out.printf("    int %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.INTEGER().getText());
+            } else if (ctx.DOUBLE() != null) {
+                out.printf("    double %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.DOUBLE().getText());
+            } else if (ctx.STRING() != null) {
+                out.printf("    String %s = \"%s\";\n", ctx.IDENTIFIER().getText(), getEscapedString(ctx.STRING().getText()));
+            } else {
+                throw new RuntimeException(format("The value of the variable '%s' can not be identified.", ctx.IDENTIFIER().getText()));
+            }
+        }
         return visitChildren(ctx);
     }
 
@@ -43,7 +70,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
         if (ctx.IDENTIFIER() != null) {
             out.println("    System.out.println(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
-            out.println("    System.out.println(\"" + ctx.STRING().getText() + "\");");
+            out.println("    System.out.println(\"" + getEscapedString(ctx.STRING().getText()) + "\");");
         } else {
             out.println("    System.out.println();");
         }

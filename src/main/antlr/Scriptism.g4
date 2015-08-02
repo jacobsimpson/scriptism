@@ -21,11 +21,22 @@ printStatement
     ;
 
 declarationStatement
-    :   VAR IDENTIFIER
+    :   VAR IDENTIFIER 'as' TYPE
+    |   VAR IDENTIFIER '=' STRING
+    |   VAR IDENTIFIER '=' INTEGER
+    |   VAR IDENTIFIER '=' DOUBLE
     ;
 
 assignmentStatement
-    :   IDENTIFIER '=' INTEGER
+    :   IDENTIFIER '=' STRING
+    |   IDENTIFIER '=' INTEGER
+    |   IDENTIFIER '=' DOUBLE
+    ;
+
+TYPE
+    :   'Int'
+    |   'String'
+    |   'Double'
     ;
 
 PRINT
@@ -37,7 +48,8 @@ VAR
     ;
 
 STRING
-    : '"' ~('\"')* '"' {setText(getText().substring(1, getText().length()-1));}
+    :   '"' ~('\"')* '"'
+    |   '\'' ~('\'')* '\''
     ;
 
 IDENTIFIER
@@ -46,6 +58,12 @@ IDENTIFIER
 
 INTEGER
     :   DIGIT+
+    ;
+
+DOUBLE
+    :   '.' DIGIT+
+    |   DIGIT+ '.'
+    |   DIGIT+ '.' DIGIT+
     ;
 
 COMMENT
