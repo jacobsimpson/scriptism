@@ -7,6 +7,7 @@ apply plugin: 'antlr'
 
 dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'com.google.guava:guava:18.0'
     testCompile 'junit:junit:4.12'
     antlr "org.antlr:antlr4:4.5" // use ANTLR version 4
 }
