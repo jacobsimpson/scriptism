@@ -10,8 +10,39 @@ options
 }
 
 program
-    :
-    |   ( COMMENT | printStatement | declarationStatement | assignmentStatement )*
+    :   statements
+    ;
+
+statements
+    :   (
+                COMMENT
+            |   printStatement
+            |   declarationStatement
+            |   assignmentStatement
+            |   ifStatement
+        )*
+    ;
+
+block
+    : '{' statements '}'
+    ;
+
+booleanExpression
+    :   IDENTIFIER '==' IDENTIFIER
+    ;
+
+ifExpression
+    :   booleanExpression
+    ;
+
+ifStatement
+    :   'if' ifExpression block
+    |   'if' ifExpression block elseStatement
+    ;
+
+elseStatement
+    :   'else' block
+    |   'else' ifStatement
     ;
 
 printStatement
