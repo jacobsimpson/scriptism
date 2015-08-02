@@ -4,9 +4,12 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import scriptism.compiler.InMemoryJavaCompiler;
+import scriptism.compiler.SourceCodeGenerationVisitor;
 import scriptism.grammar.ScriptismLexer;
 import scriptism.grammar.ScriptismParser;
 
+import javax.tools.Diagnostic;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -14,9 +17,10 @@ import java.lang.reflect.InvocationTargetException;
 public class Main {
 
     public static void main(String... args) throws IOException,
-            NoSuchMethodException,
-            IllegalAccessException,
-            InvocationTargetException, ClassNotFoundException {
+                                                   NoSuchMethodException,
+                                                   IllegalAccessException,
+                                                   InvocationTargetException,
+                                                   ClassNotFoundException {
 
         Options options = CommandLineOptions.parse(args);
         if (options.getShouldExit()) {
@@ -52,26 +56,49 @@ public class Main {
         // called an AST. A visitor for the tree will receive callbacks at each
         // node of the tree, giving it a chance to see what information the
         // parser found at that node and take some action at that time. The
-        // SimpleScript visitor will use the ASM library to generate byte code
-        // that corresponds to program statements SimpleScript supports.
+        // visitor will generate Java source code and compile that using the
+        // JavaCompiler interface of the JDK.
         final String className = "ScriptClass";
-        ByteCodeGenerationVisitor visitor = new ByteCodeGenerationVisitor(className);
+        SourceCodeGenerationVisitor visitor = new SourceCodeGenerationVisitor(className);
         visitor.visit(tree);
 
+        CompileResult compile = InMemoryJavaCompiler.compile(className, visitor.getResult());
+
         if (options.getWriteClassfile()) {
-            ClassLoaderUtils.writeClassToFile(className, visitor);
+            ClassLoaderUtils.writeSourceToFile(className, visitor);
         }
 
-        Class c = ClassLoaderUtils.loadClass(className, visitor.getResult());
-
-        // Now that the new class is loaded into memory, use reflection to call
-        // the main method. Pass in the arguments to this method with the
-        // program name trimmed off.
-        MethodUtils.invokeExactStaticMethod(c,
-                "main",
-                new Object[]{options.getArgs()},
-                new Class<?>[]{String[].class});
-
+        if (compile.isSuccess()) {
+            try {
+                Class<?> classDefinition = Class.forName(className, true, compile.getClassLoader());
+                MethodUtils.invokeExactStaticMethod(classDefinition,
+                        "main",
+                        new Object[]{options.getArgs()},
+                        new Class<?>[]{String[].class});
+            } catch (ClassNotFoundException e) {
+                System.err.println("Class not found: " + e);
+            } catch (NoSuchMethodException e) {
+                System.err.println("No such method: " + e);
+            } catch (IllegalAccessException e) {
+                System.err.println("Illegal access: " + e);
+            } catch (InvocationTargetException e) {
+                System.err.println("Invocation target: " + e);
+            }
+        } else {
+            for (Diagnostic diagnostic : compile.getDiagnostics()) {
+                System.out.println(diagnostic.getCode());
+                System.out.println(diagnostic.getKind());
+                System.out.println(diagnostic.getPosition());
+                System.out.println(diagnostic.getStartPosition());
+                System.out.println(diagnostic.getEndPosition());
+                System.out.println(diagnostic.getSource());
+                System.out.println(diagnostic.getMessage(null));
+                System.out.printf("%s: At position %s: %s\n",
+                        diagnostic.getKind(),
+                        diagnostic.getPosition(),
+                        diagnostic.getMessage(null));
+            }
+        }
     }
 
 }

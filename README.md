@@ -1,6 +1,6 @@
 # Scriptism
 
-My hobby scripting language. A marriage of static typing with accomodating syntax.
+My hobby scripting language. A marriage of static typing with accommodating syntax.
 
 ## How to Build
 1. Clone this project.

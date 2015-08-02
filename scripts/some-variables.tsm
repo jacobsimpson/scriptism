@@ -9,8 +9,20 @@ x = 3
 
 print
 
-print "The value of x = "
+print "The value of x should be 3 and is "
 print x
+print
+
+var y
+y = 5
+print "The value of y should be 5 and is "
+print y
+print
+
+y = 15
+
+print "The new value of y should be 15 and is"
+print y
 print
 
 print "The end"

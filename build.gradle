@@ -6,7 +6,6 @@ apply plugin: 'java'
 apply plugin: 'antlr'
 
 dependencies {
-    compile 'org.ow2.asm:asm:5.0.4'
     compile 'org.apache.commons:commons-lang3:3.4'
     testCompile 'junit:junit:4.12'
     antlr "org.antlr:antlr4:4.5" // use ANTLR version 4
@@ -23,7 +22,7 @@ generateGrammarSource.doLast {
     File generatedDir = file('build/generated-src/antlr/main')
     File packageDir = new File(generatedDir, 'scriptism/grammar')
     packageDir.mkdirs()
-    generatedDir.listFiles().each {File file ->
+    generatedDir.listFiles().each { File file ->
         file.renameTo(new File(packageDir, file.getName()))
     }
 }
@@ -46,25 +45,24 @@ task consolidatedJar(type: Jar) {
     with jar
 }
 
-def copy(File src, File dest) {
-
-    def input = src.newDataInputStream()
+def concat(File src1, File src2, File dest) {
+    def input1 = src1.newDataInputStream()
+    def input2 = src2.newDataInputStream()
     def output = dest.newDataOutputStream()
 
-    output << "#! /bin/sh\nexec /usr/bin/java -jar \$0 \"\$@\"\n"
+    output << input1
+    output << input2
 
-    output << input
-
-    input.close()
+    input1.close()
+    input2.close()
     output.close()
 }
 
 task executableJar(dependsOn: 'consolidatedJar') {
     doLast {
-        def jarFile = new File("build/libs/scriptism.jar")
         def executableFile = new File("build/scriptism")
 
-        copy(jarFile, executableFile)
+        concat(new File("src/main/sh/header.sh"), new File("build/libs/scriptism.jar"), executableFile)
 
         Runtime.getRuntime().exec("chmod +x " + executableFile.getAbsolutePath()).waitFor()
     }
