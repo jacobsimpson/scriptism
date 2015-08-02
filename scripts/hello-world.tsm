@@ -3,10 +3,5 @@
 # Basically, the usual simple program.
 #
 
-print
-
-print "First say this"
-print
 print "hello world"
-print
 

@@ -1,7 +1,5 @@
 package scriptism.compiler;
 
-import scriptism.CompileResult;
-
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;

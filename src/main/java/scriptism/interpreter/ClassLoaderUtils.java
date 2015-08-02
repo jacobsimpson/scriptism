@@ -1,4 +1,4 @@
-package scriptism;
+package scriptism.interpreter;
 
 import scriptism.compiler.SourceCodeGenerationVisitor;
 

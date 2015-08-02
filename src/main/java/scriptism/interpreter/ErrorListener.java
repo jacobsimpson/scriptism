@@ -1,4 +1,4 @@
-package scriptism;
+package scriptism.interpreter;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;

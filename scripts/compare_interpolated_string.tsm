@@ -1,0 +1,15 @@
+#! ./build/scriptism
+#
+# Some scenarios that use interpolated strings.
+#
+
+var s1 = "one"
+var s2 = "#{s1}"
+
+if s1 == s2 {
+    print "Interpolations are equal."
+} else {
+    print "ERROR: Interpolations should be equal but they are not."
+    print "s1 = '#{s1}'"
+    print "s2 = '#{s2}'"
+}

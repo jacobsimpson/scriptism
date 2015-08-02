@@ -1,6 +1,7 @@
 package scriptism;
 
 import org.junit.Test;
+import scriptism.interpreter.Options;
 
 import java.io.File;
 import java.io.IOException;

@@ -8,10 +8,10 @@ import scriptism.grammar.ScriptismParser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
 import static scriptism.compiler.Utils.getEscapedString;
 import static scriptism.compiler.Utils.getInterpolatedString;
@@ -21,8 +21,8 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     private final Map<String, VarType> variables = new HashMap<>();
     private final StringWriter writer = new StringWriter();
     private final PrintWriter out = new PrintWriter(writer);
-    private final Set<String> staticImports = new HashSet<>();
-    private final Set<String> imports = new HashSet<>();
+    private final Set<String> staticImports = newHashSet("scriptism.interpreter.Interpreter.out");
+    private final Set<String> imports = newHashSet();
 
     public SourceCodeGenerationVisitor(String className) {
         this.className = className;
@@ -148,7 +148,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
                     out.printf("    String %s = \"%s\";\n", ctx.IDENTIFIER().getText(), escapedString);
                 } else {
                     staticImports.add("java.lang.String.format");
-                    out.printf("    String %s = format(\"%s\\n\", %s);\n",
+                    out.printf("    String %s = format(\"%s\", %s);\n",
                             ctx.IDENTIFIER().getText(),
                             interpolatedString.getText(),
                             StringUtils.join(interpolatedString.getVariables().toArray(), ','));
@@ -163,19 +163,19 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     @Override
     public Integer visitPrintStatement(@NotNull ScriptismParser.PrintStatementContext ctx) {
         if (ctx.IDENTIFIER() != null) {
-            out.println("    System.out.println(" + ctx.IDENTIFIER().getText() + ");");
+            out.println("    out.println(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
             String escapedString = getEscapedString(ctx.STRING().getText());
             InterpolatedString interpolatedString = getInterpolatedString(escapedString);
             if (interpolatedString.getVariables().size() == 0) {
-                out.println("    System.out.println(\"" + escapedString + "\");");
+                out.println("    out.println(\"" + escapedString + "\");");
             } else {
-                out.printf("    System.out.printf(\"%s\\n\", %s);\n",
+                out.printf("    out.printf(\"%s\\n\", %s);\n",
                         interpolatedString.getText(),
                         StringUtils.join(interpolatedString.getVariables().toArray(), ','));
             }
         } else {
-            out.println("    System.out.println();");
+            out.println("    out.println();");
         }
         return visitChildren(ctx);
     }

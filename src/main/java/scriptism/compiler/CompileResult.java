@@ -1,4 +1,4 @@
-package scriptism;
+package scriptism.compiler;
 
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
