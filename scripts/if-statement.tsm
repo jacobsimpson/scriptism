@@ -3,8 +3,8 @@
 # A script to do some stuff.
 #
 
-var x = 3
-var y = 4
+var x = 3,
+    y = 4
 
 println "Before if-1. Compare x(#{x}) == y(#{y})"
 if x == y {
@@ -13,17 +13,17 @@ if x == y {
     println "x != y"
 }
 
-var s1 = "s-value"
-var s2 = "s-value"
+var s1 = "s-value",
+    s2 = "s-value"
 
 println "Before if-2. Compare s1(#{s1}) == s2(#{s2})"
 if s1 == s2 {
     println "s1 == s2"
 }
 
-var i1 = 1
-var i2 = 2
-var i3 = 3
+var i1 = 1,
+    i2 = 2,
+    i3 = 3
 
 println "Before if-3."
 if i1 == i2 {

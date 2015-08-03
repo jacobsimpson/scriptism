@@ -55,10 +55,14 @@ printlnStatement
     ;
 
 declarationStatement
-    :   VAR IDENTIFIER 'as' TYPE
-    |   VAR IDENTIFIER '=' STRING
-    |   VAR IDENTIFIER '=' INTEGER
-    |   VAR IDENTIFIER '=' DOUBLE
+    :   VAR variableDeclarationStatement (',' variableDeclarationStatement)*
+    ;
+
+variableDeclarationStatement
+    :   IDENTIFIER 'as' TYPE
+    |   IDENTIFIER '=' STRING
+    |   IDENTIFIER '=' INTEGER
+    |   IDENTIFIER '=' DOUBLE
     ;
 
 assignmentStatement

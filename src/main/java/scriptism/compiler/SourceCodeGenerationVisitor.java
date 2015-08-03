@@ -115,7 +115,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     }
 
     @Override
-    public Integer visitDeclarationStatement(@NotNull ScriptismParser.DeclarationStatementContext ctx) {
+    public Integer visitVariableDeclarationStatement(ScriptismParser.VariableDeclarationStatementContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
         if (variables.containsKey(varName)) {
             throw new RuntimeException(format("The variable '%s' is already defined.", varName));
@@ -155,18 +155,19 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
         if (ctx.IDENTIFIER() != null) {
             out.println("    out.print(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
-            out.println("    out.print(" + formattedString(ctx.STRING().getText())+ ");");
+            out.println("    out.print(" + formattedString(ctx.STRING().getText()) + ");");
         } else {
             out.println("    out.print();");
         }
         return visitChildren(ctx);
     }
 
-    @Override public Integer visitPrintlnStatement(ScriptismParser.PrintlnStatementContext ctx) {
+    @Override
+    public Integer visitPrintlnStatement(ScriptismParser.PrintlnStatementContext ctx) {
         if (ctx.IDENTIFIER() != null) {
             out.println("    out.println(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
-            out.println("    out.println(" + formattedString(ctx.STRING().getText())+ ");");
+            out.println("    out.println(" + formattedString(ctx.STRING().getText()) + ");");
         } else {
             out.println("    out.println();");
         }
