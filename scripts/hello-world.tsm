@@ -3,5 +3,5 @@
 # Basically, the usual simple program.
 #
 
-print "hello world"
+println "hello world"
 

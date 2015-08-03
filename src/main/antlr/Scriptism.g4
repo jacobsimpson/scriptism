@@ -17,6 +17,7 @@ statements
     :   (
                 COMMENT
             |   printStatement
+            |   printlnStatement
             |   declarationStatement
             |   assignmentStatement
             |   ifStatement
@@ -49,6 +50,10 @@ printStatement
     :   PRINT ( STRING | IDENTIFIER )?
     ;
 
+printlnStatement
+    :   PRINTLN ( STRING | IDENTIFIER )?
+    ;
+
 declarationStatement
     :   VAR IDENTIFIER 'as' TYPE
     |   VAR IDENTIFIER '=' STRING
@@ -70,6 +75,10 @@ TYPE
 
 PRINT
     :   'print'
+    ;
+
+PRINTLN
+    :   'println'
     ;
 
 VAR

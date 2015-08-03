@@ -153,6 +153,17 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     @Override
     public Integer visitPrintStatement(@NotNull ScriptismParser.PrintStatementContext ctx) {
         if (ctx.IDENTIFIER() != null) {
+            out.println("    out.print(" + ctx.IDENTIFIER().getText() + ");");
+        } else if (ctx.STRING() != null) {
+            out.println("    out.print(" + formattedString(ctx.STRING().getText())+ ");");
+        } else {
+            out.println("    out.print();");
+        }
+        return visitChildren(ctx);
+    }
+
+    @Override public Integer visitPrintlnStatement(ScriptismParser.PrintlnStatementContext ctx) {
+        if (ctx.IDENTIFIER() != null) {
             out.println("    out.println(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
             out.println("    out.println(" + formattedString(ctx.STRING().getText())+ ");");

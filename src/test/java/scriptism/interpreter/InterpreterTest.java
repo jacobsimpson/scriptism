@@ -66,4 +66,17 @@ public class InterpreterTest {
         assertThat(capture.toString(),
                 is(equalTo("Interpolations are equal.\n")));
     }
+
+    @Test
+    public void testPrintAndPrintln() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+        Options options = new Options().withScript(new File("scripts/print-statement.tsm"));
+        ByteArrayOutputStream capture = new ByteArrayOutputStream();
+        Interpreter.out = new PrintStream(capture);
+
+        Interpreter.execute(options);
+
+        assertThat(capture.toString(),
+                is(equalTo("one two three\n" +
+                        "four five six\n")));
+    }
 }

@@ -6,30 +6,30 @@
 var x = 3
 var y = 4
 
-print "Before if-1. Compare x(#{x}) == y(#{y})"
+println "Before if-1. Compare x(#{x}) == y(#{y})"
 if x == y {
-    print "x == y"
+    println "x == y"
 } else {
-    print "x != y"
+    println "x != y"
 }
 
 var s1 = "s-value"
 var s2 = "s-value"
 
-print "Before if-2. Compare s1(#{s1}) == s2(#{s2})"
+println "Before if-2. Compare s1(#{s1}) == s2(#{s2})"
 if s1 == s2 {
-    print "s1 == s2"
+    println "s1 == s2"
 }
 
 var i1 = 1
 var i2 = 2
 var i3 = 3
 
-print "Before if-3."
+println "Before if-3."
 if i1 == i2 {
-    print "ERROR: i1 should not equal i2"
+    println "ERROR: i1 should not equal i2"
 } else if i1 == i1 {
-    print "i1 == i1"
+    println "i1 == i1"
 } else {
-    print "ERROR: Else condition."
+    println "ERROR: Else condition."
 }

@@ -1,0 +1,10 @@
+#! ./build/scriptism
+
+print "one "
+print "two "
+println "three"
+
+print "four "
+print "five "
+println "six"
+
