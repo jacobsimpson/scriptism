@@ -105,7 +105,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
     @Override
     public Integer visitAssignmentStatement(@NotNull ScriptismParser.AssignmentStatementContext ctx) {
         if (ctx.STRING() != null) {
-            out.printf("    %s = \"%s\";\n", ctx.IDENTIFIER().getText(), getEscapedString(ctx.STRING().getText()));
+            out.printf("    %s = %s;\n", ctx.IDENTIFIER().getText(), formattedString(ctx.STRING().getText()));
         } else if (ctx.INTEGER() != null) {
             out.printf("    %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.INTEGER().getText());
         } else if (ctx.DOUBLE() != null) {
@@ -142,17 +142,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
                 out.printf("    double %s = %s;\n", ctx.IDENTIFIER().getText(), ctx.DOUBLE().getText());
             } else if (ctx.STRING() != null) {
                 variables.put(varName, VarType.STRING);
-                String escapedString = getEscapedString(ctx.STRING().getText());
-                InterpolatedString interpolatedString = getInterpolatedString(escapedString);
-                if (interpolatedString.getVariables().size() == 0) {
-                    out.printf("    String %s = \"%s\";\n", ctx.IDENTIFIER().getText(), escapedString);
-                } else {
-                    staticImports.add("java.lang.String.format");
-                    out.printf("    String %s = format(\"%s\", %s);\n",
-                            ctx.IDENTIFIER().getText(),
-                            interpolatedString.getText(),
-                            StringUtils.join(interpolatedString.getVariables().toArray(), ','));
-                }
+                out.printf("    String %s = %s;\n", ctx.IDENTIFIER().getText(), formattedString(ctx.STRING().getText()));
             } else {
                 throw new RuntimeException(format("The value of the variable '%s' can not be identified.", ctx.IDENTIFIER().getText()));
             }
@@ -165,19 +155,24 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
         if (ctx.IDENTIFIER() != null) {
             out.println("    out.println(" + ctx.IDENTIFIER().getText() + ");");
         } else if (ctx.STRING() != null) {
-            String escapedString = getEscapedString(ctx.STRING().getText());
-            InterpolatedString interpolatedString = getInterpolatedString(escapedString);
-            if (interpolatedString.getVariables().size() == 0) {
-                out.println("    out.println(\"" + escapedString + "\");");
-            } else {
-                out.printf("    out.printf(\"%s\\n\", %s);\n",
-                        interpolatedString.getText(),
-                        StringUtils.join(interpolatedString.getVariables().toArray(), ','));
-            }
+            out.println("    out.println(" + formattedString(ctx.STRING().getText())+ ");");
         } else {
             out.println("    out.println();");
         }
         return visitChildren(ctx);
+    }
+
+    private String formattedString(String text) {
+        String escapedString = getEscapedString(text);
+        InterpolatedString interpolatedString = getInterpolatedString(escapedString);
+        if (interpolatedString.getVariables().size() == 0) {
+            return "\"" + escapedString + "\"";
+        } else {
+            staticImports.add("java.lang.String.format");
+            return format("format(\"%s\", %s)",
+                    interpolatedString.getText(),
+                    StringUtils.join(interpolatedString.getVariables().toArray(), ','));
+        }
     }
 
     @Override

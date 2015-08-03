@@ -50,8 +50,9 @@ public class InterpreterTest {
         Interpreter.execute(options);
 
         assertThat(capture.toString(),
-                is(equalTo("This is the number 3.\n" +
-                        "Your name is joseph and you live here.\n")));
+                is(equalTo("The number 3.\n" +
+                        "Your name is joseph and you live here.\n" +
+                        "One last time joseph\n")));
     }
 
     @Test

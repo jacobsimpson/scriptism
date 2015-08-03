@@ -4,7 +4,7 @@
 #
 
 var i = 3
-var s = "This is the number #{i}."
+var s = "The number #{i}."
 
 print s
 
@@ -12,3 +12,5 @@ var name = "joseph"
 
 print "Your name is #{name} and you live here."
 
+s = "One last time #{name}"
+print s

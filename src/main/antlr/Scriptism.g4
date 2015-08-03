@@ -46,9 +46,7 @@ elseStatement
     ;
 
 printStatement
-    :   PRINT
-    |   PRINT STRING
-    |   PRINT IDENTIFIER
+    :   PRINT ( STRING | IDENTIFIER )?
     ;
 
 declarationStatement
