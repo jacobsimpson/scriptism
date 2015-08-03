@@ -3,33 +3,51 @@
 # A script to do some stuff.
 #
 
+println "Integer Comparisons"
+println "=================="
 var x = 3,
     y = 4
 
-println "Before if-1. Compare x(#{x}) == y(#{y})"
-if x == y {
-    println "x == y"
-} else {
-    println "x != y"
-}
+print "Is x(=#{x}) <  y(=#{y}) "
+if x < y { println "yes" } else { println "no" }
 
-var s1 = "s-value",
-    s2 = "s-value"
+print "Is x(=#{x}) <= y(=#{y}) "
+if x <= y { println "yes" } else { println "no" }
 
-println "Before if-2. Compare s1(#{s1}) == s2(#{s2})"
-if s1 == s2 {
-    println "s1 == s2"
-}
+print "Is x(=#{x}) == y(=#{y}) "
+if x == y { println "yes" } else { println "no" }
 
-var i1 = 1,
-    i2 = 2,
-    i3 = 3
+print "Is x(=#{x}) != y(=#{y}) "
+if x != y { println "yes" } else { println "no" }
 
-println "Before if-3."
-if i1 == i2 {
-    println "ERROR: i1 should not equal i2"
-} else if i1 == i1 {
-    println "i1 == i1"
-} else {
-    println "ERROR: Else condition."
-}
+print "Is x(=#{x}) >= y(=#{y}) "
+if x >= y { println "yes" } else { println "no" }
+
+print "Is x(=#{x}) >  y(=#{y}) "
+if x > y { println "yes" } else { println "no" }
+
+println
+println "String Comparisons"
+println "=================="
+
+var s1 = "s-value30",
+    s2 = "s-value2"
+
+print "Is s1(=#{s1}) <  s2(=#{s2}) "
+if s1 < s2 { println "yes" } else { println "no" }
+
+print "Is s1(=#{s1}) <= s2(=#{s2}) "
+if s1 <= s2 { println "yes" } else { println "no" }
+
+print "Is s1(=#{s1}) == s2(=#{s2}) "
+if s1 == s2 { println "yes" } else { println "no" }
+
+print "Is s1(=#{s1}) != s2(=#{s2}) "
+if s1 != s2 { println "yes" } else { println "no" }
+
+print "Is s1(=#{s1}) >= s2(=#{s2}) "
+if s1 >= s2 { println "yes" } else { println "no" }
+
+print "Is s1(=#{s1}) >  s2(=#{s2}) "
+if s1 > s2 { println "yes" } else { println "no" }
+

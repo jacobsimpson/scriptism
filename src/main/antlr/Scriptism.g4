@@ -29,7 +29,7 @@ block
     ;
 
 booleanExpression
-    :   IDENTIFIER '==' IDENTIFIER
+    :   IDENTIFIER COMPARISON_OPERATOR IDENTIFIER
     ;
 
 ifExpression
@@ -92,6 +92,10 @@ VAR
 STRING
     :   '"' ~('\"')* '"'
     |   '\'' ~('\'')* '\''
+    ;
+
+COMPARISON_OPERATOR
+    :   ( '<' | '<=' | '==' | '!=' | '>=' | '>' )
     ;
 
 IDENTIFIER

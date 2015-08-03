@@ -69,8 +69,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
             }
             if (variables.get(varName1) == VarType.STRING) {
                 if (variables.get(varName2) == VarType.STRING) {
-                    imports.add("java.util.Objects");
-                    out.printf("Objects.equals(%s, %s)", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+                    compareStrings(ctx);
                 } else {
                     throw new RuntimeException(format("Can not compare %s to %s on line %s.",
                             variables.get(varName1),
@@ -79,7 +78,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
                 }
             } else if (variables.get(varName1) == VarType.INT) {
                 if (variables.get(varName2) == VarType.INT) {
-                    out.printf("%s == %s", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+                    compareNumerics(ctx);
                 } else {
                     throw new RuntimeException(format("Can not compare %s to %s on line %s.",
                             variables.get(varName1),
@@ -88,7 +87,7 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
                 }
             } else if (variables.get(varName1) == VarType.DOUBLE) {
                 if (variables.get(varName2) == VarType.DOUBLE) {
-                    out.printf("%s == %s", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+                    compareNumerics(ctx);
                 } else {
                     throw new RuntimeException(format("Can not compare %s to %s on line %s.",
                             variables.get(varName1),
@@ -100,6 +99,52 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
             throw new RuntimeException(format("On line %s, there are not two variables to compare.", ctx.getStart().getLine()));
         }
         return visitChildren(ctx);
+    }
+
+    private void compareNumerics(ScriptismParser.BooleanExpressionContext ctx) {
+        if ("<".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s < %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("<=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s <= %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("==".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s == %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("!=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s != %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if (">=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s >= %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if (">".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" %s > %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        }
+    }
+
+    private void compareStrings(ScriptismParser.BooleanExpressionContext ctx) {
+        if ("<".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            imports.add("scriptism.interpreter.NullSafeStringComparator");
+            out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) < 0",
+                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("<=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            imports.add("scriptism.interpreter.NullSafeStringComparator");
+            out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) <= 0",
+                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("==".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            out.printf(" Objects.equals(%s, %s) ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if ("!=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            out.printf(" !Objects.equals(%s, %s) ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if (">=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            imports.add("scriptism.interpreter.NullSafeStringComparator");
+            out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) >= 0",
+                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        } else if (">".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            imports.add("java.util.Objects");
+            imports.add("scriptism.interpreter.NullSafeStringComparator");
+            out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) > 0",
+                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+        }
     }
 
     @Override

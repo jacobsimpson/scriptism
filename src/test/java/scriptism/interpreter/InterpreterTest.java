@@ -33,12 +33,23 @@ public class InterpreterTest {
         Interpreter.execute(options);
 
         assertThat(capture.toString(),
-                is(equalTo("Before if-1. Compare x(3) == y(4)\n" +
-                        "x != y\n" +
-                        "Before if-2. Compare s1(s-value) == s2(s-value)\n" +
-                        "s1 == s2\n" +
-                        "Before if-3.\n" +
-                        "i1 == i1\n")));
+                is(equalTo("Integer Comparisons\n" +
+                        "==================\n" +
+                        "Is x(=3) <  y(=4) yes\n" +
+                        "Is x(=3) <= y(=4) yes\n" +
+                        "Is x(=3) == y(=4) no\n" +
+                        "Is x(=3) != y(=4) yes\n" +
+                        "Is x(=3) >= y(=4) no\n" +
+                        "Is x(=3) >  y(=4) no\n" +
+                        "\n" +
+                        "String Comparisons\n" +
+                        "==================\n" +
+                        "Is s1(=s-value30) <  s2(=s-value2) no\n" +
+                        "Is s1(=s-value30) <= s2(=s-value2) no\n" +
+                        "Is s1(=s-value30) == s2(=s-value2) no\n" +
+                        "Is s1(=s-value30) != s2(=s-value2) yes\n" +
+                        "Is s1(=s-value30) >= s2(=s-value2) yes\n" +
+                        "Is s1(=s-value30) >  s2(=s-value2) yes\n")));
     }
 
     @Test
