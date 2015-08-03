@@ -14,8 +14,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class InterpreterTest {
     @Test
-    public void testHelloWorld() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
-        Options options = new Options().withScript(new File("scripts/hello-world.tsm"));
+    public void hello_world() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+        Options options = new Options().withScript(new File("scripts/hello_world.tsm"));
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
         Interpreter.out = new PrintStream(capture);
 
@@ -25,8 +25,8 @@ public class InterpreterTest {
     }
 
     @Test
-    public void testIfStatement() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
-        Options options = new Options().withScript(new File("scripts/if-statement.tsm"));
+    public void if_statement() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+        Options options = new Options().withScript(new File("scripts/if_statement.tsm"));
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
         Interpreter.out = new PrintStream(capture);
 
@@ -42,7 +42,7 @@ public class InterpreterTest {
     }
 
     @Test
-    public void testInterpolatedString() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+    public void interpolated_string() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
         Options options = new Options().withScript(new File("scripts/interpolated_string.tsm"));
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
         Interpreter.out = new PrintStream(capture);
@@ -56,7 +56,7 @@ public class InterpreterTest {
     }
 
     @Test
-    public void testCompareInterpolatedString() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+    public void compare_interpolated_string() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
         Options options = new Options().withScript(new File("scripts/compare_interpolated_string.tsm"));
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
         Interpreter.out = new PrintStream(capture);
@@ -68,8 +68,8 @@ public class InterpreterTest {
     }
 
     @Test
-    public void testPrintAndPrintln() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
-        Options options = new Options().withScript(new File("scripts/print-statement.tsm"));
+    public void print_statement() throws InvocationTargetException, NoSuchMethodException, ClassNotFoundException, IllegalAccessException, IOException {
+        Options options = new Options().withScript(new File("scripts/print_statement.tsm"));
         ByteArrayOutputStream capture = new ByteArrayOutputStream();
         Interpreter.out = new PrintStream(capture);
 
