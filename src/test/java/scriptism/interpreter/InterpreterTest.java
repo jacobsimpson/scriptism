@@ -42,6 +42,15 @@ public class InterpreterTest {
                         "Is x(=3) >= y(=4) no\n" +
                         "Is x(=3) >  y(=4) no\n" +
                         "\n" +
+                        "Integer Literal Comparisons\n" +
+                        "===========================\n" +
+                        "Is 5 <  y(=4) no\n" +
+                        "Is x(=3) <= 5 yes\n" +
+                        "Is 6 == 6 yes\n" +
+                        "Is 4 != y(=4) no\n" +
+                        "Is 5 >= y(=4) yes\n" +
+                        "Is x(=3) >  5 no\n" +
+                        "\n" +
                         "String Comparisons\n" +
                         "==================\n" +
                         "Is s1(=s-value30) <  s2(=s-value2) no\n" +
@@ -49,7 +58,16 @@ public class InterpreterTest {
                         "Is s1(=s-value30) == s2(=s-value2) no\n" +
                         "Is s1(=s-value30) != s2(=s-value2) yes\n" +
                         "Is s1(=s-value30) >= s2(=s-value2) yes\n" +
-                        "Is s1(=s-value30) >  s2(=s-value2) yes\n")));
+                        "Is s1(=s-value30) >  s2(=s-value2) yes\n" +
+                        "\n" +
+                        "String Literal Comparisons\n" +
+                        "==========================\n" +
+                        "Is s1(=s-value30) <  's-value2' no\n" +
+                        "Is 's-value2' <= s2(=s-value2) yes\n" +
+                        "Is 's-value2' == 's-value2' yes\n" +
+                        "Is 's-value2' != 's-value22' yes\n" +
+                        "Is 's-value2' >= s2(=s-value2) yes\n" +
+                        "Is 's-value2' >  s2(=s-value2) no\n")));
     }
 
     @Test

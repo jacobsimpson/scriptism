@@ -29,7 +29,7 @@ block
     ;
 
 booleanExpression
-    :   IDENTIFIER COMPARISON_OPERATOR IDENTIFIER
+    :   atom COMPARISON_OPERATOR atom
     ;
 
 ifExpression
@@ -69,6 +69,13 @@ assignmentStatement
     :   IDENTIFIER '=' STRING
     |   IDENTIFIER '=' INTEGER
     |   IDENTIFIER '=' DOUBLE
+    ;
+
+atom
+    :   IDENTIFIER
+    |   STRING
+    |   INTEGER
+    |   DOUBLE
     ;
 
 TYPE

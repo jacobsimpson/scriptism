@@ -56,94 +56,138 @@ public class SourceCodeGenerationVisitor extends ScriptismBaseVisitor<Integer> {
         return result;
     }
 
+    private static class Atom {
+        private final VarType type;
+        private final boolean literal;
+        private final String value;
+
+        public Atom(VarType type, boolean literal, String value) {
+            this.type = type;
+            this.literal = literal;
+            this.value = value;
+        }
+
+        public VarType getType() {
+            return type;
+        }
+
+        public boolean isLiteral() {
+            return literal;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    private Atom getAtom(ScriptismParser.AtomContext atom) {
+        if (atom.IDENTIFIER() != null) {
+            String varName = atom.IDENTIFIER().getText();
+
+            if (!variables.containsKey(varName)) {
+                throw new RuntimeException(format("The variable '%s' is not defined.", varName));
+            }
+            return new Atom(variables.get(varName), false, varName);
+        } else if (atom.DOUBLE() != null) {
+            return new Atom(VarType.DOUBLE, true, atom.DOUBLE().getText());
+        } else if (atom.INTEGER() != null) {
+            return new Atom(VarType.INT, true, atom.getText());
+        } else if (atom.STRING() != null) {
+            return new Atom(VarType.STRING, true, atom.getText());
+        }
+        return null;
+    }
+
     @Override
     public Integer visitBooleanExpression(ScriptismParser.BooleanExpressionContext ctx) {
-        if (ctx.IDENTIFIER(0) != null && ctx.IDENTIFIER(1) != null) {
-            String varName1 = ctx.IDENTIFIER(0).getText();
-            String varName2 = ctx.IDENTIFIER(1).getText();
-            if (!variables.containsKey(varName1)) {
-                throw new RuntimeException(format("The variable '%s' is not defined.", varName1));
+        Atom atom1 = getAtom(ctx.atom(0));
+        Atom atom2 = getAtom(ctx.atom(1));
+
+        if (atom1 == null || atom2 == null) {
+            throw new RuntimeException("Unknown type.");
+        }
+        
+        if (atom1.getType() == VarType.STRING) {
+            if (atom2.getType() == VarType.STRING) {
+                compareStrings(atom1, atom2, ctx.COMPARISON_OPERATOR().getText());
+            } else {
+                throw new RuntimeException(format("Can not compare %s to %s on line %s.",
+                        atom1.getType(),
+                        atom2.getType(),
+                        ctx.getStart().getLine()));
             }
-            if (!variables.containsKey(varName2)) {
-                throw new RuntimeException(format("The variable '%s' is not defined.", varName2));
+        } else if (atom1.getType() == VarType.INT) {
+            if (atom2.getType() == VarType.INT) {
+                compareNumerics(atom1, atom2, ctx.COMPARISON_OPERATOR().getText());
+            } else {
+                throw new RuntimeException(format("Can not compare %s to %s on line %s.",
+                        atom1.getType(),
+                        atom2.getType(),
+                        ctx.getStart().getLine()));
             }
-            if (variables.get(varName1) == VarType.STRING) {
-                if (variables.get(varName2) == VarType.STRING) {
-                    compareStrings(ctx);
-                } else {
-                    throw new RuntimeException(format("Can not compare %s to %s on line %s.",
-                            variables.get(varName1),
-                            variables.get(varName2),
-                            ctx.getStart().getLine()));
-                }
-            } else if (variables.get(varName1) == VarType.INT) {
-                if (variables.get(varName2) == VarType.INT) {
-                    compareNumerics(ctx);
-                } else {
-                    throw new RuntimeException(format("Can not compare %s to %s on line %s.",
-                            variables.get(varName1),
-                            variables.get(varName2),
-                            ctx.getStart().getLine()));
-                }
-            } else if (variables.get(varName1) == VarType.DOUBLE) {
-                if (variables.get(varName2) == VarType.DOUBLE) {
-                    compareNumerics(ctx);
-                } else {
-                    throw new RuntimeException(format("Can not compare %s to %s on line %s.",
-                            variables.get(varName1),
-                            variables.get(varName2),
-                            ctx.getStart().getLine()));
-                }
+        } else if (atom1.getType() == VarType.DOUBLE) {
+            if (atom2.getType() == VarType.DOUBLE) {
+                compareNumerics(atom1, atom2, ctx.COMPARISON_OPERATOR().getText());
+            } else {
+                throw new RuntimeException(format("Can not compare %s to %s on line %s.",
+                        atom1.getType(),
+                        atom2.getType(),
+                        ctx.getStart().getLine()));
             }
-        } else {
-            throw new RuntimeException(format("On line %s, there are not two variables to compare.", ctx.getStart().getLine()));
         }
         return visitChildren(ctx);
     }
 
-    private void compareNumerics(ScriptismParser.BooleanExpressionContext ctx) {
-        if ("<".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s < %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("<=".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s <= %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("==".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s == %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("!=".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s != %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if (">=".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s >= %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if (">".equals(ctx.COMPARISON_OPERATOR().getText())) {
-            out.printf(" %s > %s ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+    private void compareNumerics(Atom atom1, Atom atom2, String comparisonOperator) {
+        if ("<".equals(comparisonOperator)) {
+            out.printf(" %s < %s ", getAtomString(atom1), getAtomString(atom2));
+        } else if ("<=".equals(comparisonOperator)) {
+            out.printf(" %s <= %s ", getAtomString(atom1), getAtomString(atom2));
+        } else if ("==".equals(comparisonOperator)) {
+            out.printf(" %s == %s ", getAtomString(atom1), getAtomString(atom2));
+        } else if ("!=".equals(comparisonOperator)) {
+            out.printf(" %s != %s ", getAtomString(atom1), getAtomString(atom2));
+        } else if (">=".equals(comparisonOperator)) {
+            out.printf(" %s >= %s ", getAtomString(atom1), getAtomString(atom2));
+        } else if (">".equals(comparisonOperator)) {
+            out.printf(" %s > %s ", getAtomString(atom1), getAtomString(atom2));
         }
     }
 
-    private void compareStrings(ScriptismParser.BooleanExpressionContext ctx) {
-        if ("<".equals(ctx.COMPARISON_OPERATOR().getText())) {
+    private String getAtomString(Atom atom) {
+        if (atom.getType() == VarType.STRING && atom.isLiteral()) {
+            return formattedString(atom.getValue());
+        }
+        return atom.getValue();
+    }
+
+    private void compareStrings(Atom atom1, Atom atom2, String comparisonOperator) {
+        if ("<".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
             imports.add("scriptism.interpreter.NullSafeStringComparator");
             out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) < 0",
-                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("<=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+                    getAtomString(atom1), getAtomString(atom2));
+        } else if ("<=".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
             imports.add("scriptism.interpreter.NullSafeStringComparator");
             out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) <= 0",
-                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("==".equals(ctx.COMPARISON_OPERATOR().getText())) {
+                    getAtomString(atom1), getAtomString(atom2));
+        } else if ("==".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
-            out.printf(" Objects.equals(%s, %s) ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if ("!=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" Objects.equals(%s, %s) ", getAtomString(atom1), getAtomString(atom2));
+        } else if ("!=".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
-            out.printf(" !Objects.equals(%s, %s) ", ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if (">=".equals(ctx.COMPARISON_OPERATOR().getText())) {
+            out.printf(" !Objects.equals(%s, %s) ", getAtomString(atom1), getAtomString(atom2));
+        } else if (">=".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
             imports.add("scriptism.interpreter.NullSafeStringComparator");
             out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) >= 0",
-                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
-        } else if (">".equals(ctx.COMPARISON_OPERATOR().getText())) {
+                    getAtomString(atom1), getAtomString(atom2));
+        } else if (">".equals(comparisonOperator)) {
             imports.add("java.util.Objects");
             imports.add("scriptism.interpreter.NullSafeStringComparator");
             out.printf(" Objects.compare(%s, %s, NullSafeStringComparator.COMPARATOR) > 0",
-                    ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText());
+                    getAtomString(atom1), getAtomString(atom2));
         }
     }
 
